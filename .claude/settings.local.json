@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx playwright *)",
+      "Bash(rm -f verify-admin-posts.png verify-admin-posts-v2.png verify-admin-posts-full.png verify-bottom.png verify-final.png verify-v3.png)",
+      "Bash(pnpm tsc *)",
+      "Skill(run)",
+      "Bash(chromium-cli --help)"
+    ]
+  }
+}
