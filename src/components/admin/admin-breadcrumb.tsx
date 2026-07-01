@@ -6,12 +6,12 @@ import { Home, ChevronRight } from 'lucide-react'
 
 const breadcrumbMap: Record<string, string> = {
   '/admin/posts': 'BLOG & NEWS',
-  '/admin/careers': 'CAREERS',
-  '/admin/research': 'RESEARCH',
-  '/admin/sns': 'SNS',
-  '/admin/users': 'ADMIN USER',
-  '/admin/board': 'BOARD',
-  '/admin/privacy': 'PRIVACY POLICY',
+  // '/admin/careers': 'CAREERS',
+  // '/admin/research': 'RESEARCH',
+  // '/admin/sns': 'SNS',
+  // '/admin/users': 'ADMIN USER',
+  // '/admin/board': 'BOARD',
+  // '/admin/privacy': 'PRIVACY POLICY',
 }
 
 export function AdminBreadcrumb() {
@@ -27,7 +27,7 @@ export function AdminBreadcrumb() {
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
         <Home className="h-3.5 w-3.5" />
         <Link href="/admin" className="hover:text-foreground">
-          42dot
+          Hivelab
         </Link>
         {crumbLabel && (
           <>

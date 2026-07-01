@@ -100,9 +100,9 @@ const columns: ColumnDef<Post>[] = [
     cell: ({ row }) => {
       const status = row.getValue<string>('status')
       return status === 'published' ? (
-        <Badge className="bg-violet-600 text-white hover:bg-violet-700">게시</Badge>
+        <Badge className="bg-green-100 text-gray-900 border-none shadow-none px-3 py-2 font-normal text-[12px]">게시</Badge>
       ) : (
-        <Badge variant="outline" className="text-muted-foreground">
+        <Badge className="bg-gray-100 text-gray-400 border-none shadow-none px-3 py-2 font-normal text-[12px]">
           Draft
         </Badge>
       )
@@ -117,7 +117,7 @@ const columns: ColumnDef<Post>[] = [
         href={`/admin/posts/${row.original.id}/edit`}
         className={cn(
           buttonVariants({ variant: 'outline', size: 'sm' }),
-          'border-gray-300 text-xs'
+          'border-gray-200 text-xs px-3 h-8 bg-white hover:bg-gray-50 text-gray-700 font-medium shadow-none transition-colors min-w-25'
         )}
       >
         수정
@@ -174,12 +174,11 @@ export function PostTable({ data }: PostTableProps) {
   const currentPageIndex = table.getState().pagination.pageIndex
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3 mb-5">
         {/* Search */}
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search"
             value={searchValue}
@@ -187,8 +186,9 @@ export function PostTable({ data }: PostTableProps) {
               setSearchValue(e.target.value)
               setPagination((p) => ({ ...p, pageIndex: 0 }))
             }}
-            className="h-10 w-56 pl-9"
+            className="h-10 w-72 pr-9 border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md"
           />
+          <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         </div>
 
         {/* Date range */}
@@ -202,11 +202,11 @@ export function PostTable({ data }: PostTableProps) {
                 setPagination((p) => ({ ...p, pageIndex: 0 }))
               }}
               placeholder="YYYY.MM.DD"
-              className="h-10 w-40 pr-9 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-9 [&::-webkit-calendar-picker-indicator]:opacity-0"
+              className="h-10 w-[150px] pr-9 border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-9 [&::-webkit-calendar-picker-indicator]:opacity-0"
             />
             <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           </div>
-          <span className="text-sm text-muted-foreground">-</span>
+          <span className="text-sm text-gray-400 font-medium">-</span>
           <div className="relative">
             <Input
               type="date"
@@ -216,7 +216,7 @@ export function PostTable({ data }: PostTableProps) {
                 setPagination((p) => ({ ...p, pageIndex: 0 }))
               }}
               placeholder="YYYY.MM.DD"
-              className="h-10 w-40 pr-9 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-9 [&::-webkit-calendar-picker-indicator]:opacity-0"
+              className="h-10 w-[150px] pr-9 border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-9 [&::-webkit-calendar-picker-indicator]:opacity-0"
             />
             <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           </div>
@@ -224,15 +224,15 @@ export function PostTable({ data }: PostTableProps) {
       </div>
 
       {/* Count + page-size */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          전체 <span className="font-semibold text-foreground">{filteredData.length}</span>
+      <div className="flex items-center justify-between mb-2.5">
+        <p className="text-sm text-gray-700">
+          전체 <span className="font-bold text-gray-900">{filteredData.length}</span>
         </p>
         <Select
           value={String(pagination.pageSize)}
           onValueChange={(val) => setPagination({ pageIndex: 0, pageSize: Number(val) })}
         >
-          <SelectTrigger className="h-9 w-36 text-xs">
+          <SelectTrigger className="h-9 w-32 text-xs border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md">
             {pagination.pageSize}개씩 보기
           </SelectTrigger>
           <SelectContent>
@@ -244,16 +244,16 @@ export function PostTable({ data }: PostTableProps) {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg border">
+      <div className="overflow-hidden rounded-lg border border-gray-200">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-muted/50 hover:bg-muted/50">
+              <TableRow key={headerGroup.id} className="bg-gray-50 hover:bg-gray-50 border-b border-gray-200 border-collapse">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
                     className={cn(
-                      'py-3 text-xs font-semibold text-muted-foreground',
+                      'py-3.5 px-4 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0',
                       header.column.id === 'title' ? 'text-left' : 'text-center'
                     )}
                     style={{ width: header.column.columnDef.size }}
@@ -281,12 +281,13 @@ export function PostTable({ data }: PostTableProps) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() ? 'selected' : undefined}
+                  className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50/50"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        'py-4 align-middle',
+                        'py-3.5 px-4 align-middle border-r border-gray-200 last:border-r-0',
                         cell.column.id === 'title' ? 'text-left' : 'text-center'
                       )}
                     >
@@ -301,16 +302,16 @@ export function PostTable({ data }: PostTableProps) {
       </div>
 
       {/* Footer: delete | pagination | register */}
-      <div className="flex items-center justify-between pt-1">
-        <Button variant="outline" size="sm" disabled={selectedIds.length === 0}>
-          삭제{selectedIds.length > 0 ? ` (${selectedIds.length})` : ''}
-        </Button>
+      <div className="relative flex items-center justify-between pt-5">
+        {/* Left Spacer to push pagination to center */}
+        <div className="flex-1" />
 
-        <div className="flex items-center gap-1">
+        {/* Center: Pagination */}
+        <div className="flex items-center gap-1 justify-center">
           <Button
             variant="ghost"
             size="icon-sm"
-            className="rounded-full"
+            className="rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-30 h-8 w-8"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
@@ -322,8 +323,10 @@ export function PostTable({ data }: PostTableProps) {
               variant={currentPageIndex === i ? 'default' : 'ghost'}
               size="icon-sm"
               className={cn(
-                'rounded-full',
-                currentPageIndex === i && 'bg-violet-600 hover:bg-violet-700'
+                'rounded-md h-8 w-8 text-sm font-medium transition-colors',
+                currentPageIndex === i
+                  ? 'bg-violet-600 hover:bg-violet-700 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
               )}
               onClick={() => table.setPageIndex(i)}
             >
@@ -333,7 +336,7 @@ export function PostTable({ data }: PostTableProps) {
           <Button
             variant="ghost"
             size="icon-sm"
-            className="rounded-full"
+            className="rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-30 h-8 w-8"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
@@ -341,12 +344,31 @@ export function PostTable({ data }: PostTableProps) {
           </Button>
         </div>
 
-        <Link
-          href="/admin/posts/new"
-          className={cn(buttonVariants(), 'bg-violet-600 hover:bg-violet-700')}
-        >
-          등록
-        </Link>
+        {/* Right: Actions */}
+        <div className="flex flex-1 justify-end items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={selectedIds.length === 0}
+            className={cn(
+              "text-xs px-4 h-9 rounded-md transition-colors",
+              selectedIds.length === 0
+                ? "bg-gray-50 text-gray-400 border-gray-100 cursor-not-allowed opacity-100"
+                : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+            )}
+          >
+            삭제{selectedIds.length > 0 ? ` (${selectedIds.length})` : ''}
+          </Button>
+          <Link
+            href="/admin/posts/new"
+            className={cn(
+              buttonVariants({ size: 'sm' }),
+              'bg-violet-600 hover:bg-violet-700 text-white text-xs px-4 h-9 rounded-md transition-colors'
+            )}
+          >
+            등록
+          </Link>
+        </div>
       </div>
     </div>
   )
