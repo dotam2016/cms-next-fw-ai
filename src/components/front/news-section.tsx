@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Search, X } from 'lucide-react'
 import { listNews, type NewsListItem } from '@/lib/api/news'
 
 const PAGE_SIZE = 7
@@ -42,6 +42,10 @@ export function NewsSection() {
   if (q !== syncedQ) {
     setSyncedQ(q)
     setSearchValue(q)
+  }
+
+  const handleSearchSubmit = () => {
+    updateParams({ q: searchValue || null, page: null })
   }
 
   const updateParams = (updates: Record<string, string | null>) => {
@@ -103,41 +107,57 @@ export function NewsSection() {
             Press releases, product announcements, and corporate updates
           </p>
         </div>
-        <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') updateParams({ q: searchValue || null, page: null })
-            }}
-            placeholder="Search news..."
-            className="h-10 w-full rounded-md border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-[#1D4ED8]"
-          />
+        <div className="flex w-full items-center gap-3 sm:w-auto">
+          <div className="relative w-full sm:w-72">
+            <button
+              type="button"
+              onClick={handleSearchSubmit}
+              aria-label="Search"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <Search className="h-4 w-4" />
+            </button>
+            <input
+              type="text"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSearchSubmit()
+              }}
+              placeholder="Search news..."
+              className="h-10 w-full rounded-md border border-gray-200 bg-white pl-9 pr-8 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-[#1D4ED8]"
+            />
+            {searchValue && (
+              <button
+                type="button"
+                onClick={() => setSearchValue('')}
+                aria-label="Clear search"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          <div className="relative shrink-0">
+            <select
+              value={year}
+              onChange={(e) => updateParams({ year: e.target.value || null, page: null })}
+              className="h-10 appearance-none rounded-md border border-gray-200 bg-white pl-4 pr-9 text-xs font-medium text-gray-600 outline-none hover:bg-gray-50"
+            >
+              <option value="">All Years</option>
+              {YEAR_OPTIONS.map((y) => (
+                <option key={y} value={y}>
+                  Year: {y}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+          </div>
         </div>
       </div>
 
-      {/* Year filter */}
-      <div className="mt-8 flex items-center justify-end">
-        <div className="relative">
-          <select
-            value={year}
-            onChange={(e) => updateParams({ year: e.target.value || null, page: null })}
-            className="h-9 appearance-none rounded-md border border-gray-200 bg-white pl-4 pr-9 text-xs font-medium text-gray-600 outline-none hover:bg-gray-50"
-          >
-            <option value="">All Years</option>
-            {YEAR_OPTIONS.map((y) => (
-              <option key={y} value={y}>
-                Year: {y}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
-        </div>
-      </div>
-
-      <hr className="mt-6 border-gray-200" />
+      <hr className="mt-8 border-gray-200" />
 
       {loading ? (
         <p className="mt-8 text-center text-sm text-gray-400">불러오는 중...</p>
@@ -160,7 +180,7 @@ export function NewsSection() {
                 <div className="relative h-56 w-full shrink-0 sm:h-auto sm:w-72">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={`https://picsum.photos/seed/news${featured.id}/500/400`}
+                    src={`https://picsum.photos/id/${featured.id}/600/400`}
                     alt=""
                     className="h-full w-full object-cover"
                   />
@@ -189,7 +209,7 @@ export function NewsSection() {
                   <div className="relative h-44 w-full shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={`https://picsum.photos/seed/news${item.id}/600/400`}
+                      src={`https://picsum.photos/id/${item.id}/600/400`}
                       alt=""
                       className="h-full w-full object-cover"
                     />
@@ -214,15 +234,17 @@ export function NewsSection() {
       {/* Pagination */}
       {!loading && !error && total > 0 && (
         <div className="mt-10 flex items-center justify-center gap-1">
-          <button
-            type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30"
-            aria-label="Previous page"
-            onClick={() => updateParams({ page: String(page - 1) })}
-            disabled={page <= 1}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
+          {pageCount > 1 && (
+            <button
+              type="button"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30"
+              aria-label="Previous page"
+              onClick={() => updateParams({ page: String(page - 1) })}
+              disabled={page <= 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+          )}
           {Array.from({ length: pageCount }, (_, i) => (
             <button
               key={i}
@@ -237,15 +259,17 @@ export function NewsSection() {
               {i + 1}
             </button>
           ))}
-          <button
-            type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30"
-            aria-label="Next page"
-            onClick={() => updateParams({ page: String(page + 1) })}
-            disabled={page >= pageCount}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
+          {pageCount > 1 && (
+            <button
+              type="button"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30"
+              aria-label="Next page"
+              onClick={() => updateParams({ page: String(page + 1) })}
+              disabled={page >= pageCount}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          )}
         </div>
       )}
     </>
