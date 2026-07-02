@@ -27,6 +27,7 @@ export interface NewsListItem {
   url: string | null
   published_at: string | null
   view_count: number
+  is_trending: boolean
   crawled_at: string
 }
 
