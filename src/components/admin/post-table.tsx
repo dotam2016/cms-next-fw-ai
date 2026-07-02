@@ -360,7 +360,7 @@ export function PostTable({ data }: PostTableProps) {
             삭제{selectedIds.length > 0 ? ` (${selectedIds.length})` : ''}
           </Button>
           <Link
-            href="/admin/posts/new"
+            href="/admin/posts/create"
             className={cn(
               buttonVariants({ size: 'sm' }),
               'bg-violet-600 hover:bg-violet-700 text-white text-xs px-4 h-9 rounded-md transition-colors w-30'
