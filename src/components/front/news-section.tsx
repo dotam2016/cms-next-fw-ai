@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import {
   ArrowDownWideNarrow,
+  ArrowLeft,
   ArrowRight,
   ArrowUpWideNarrow,
   ChevronDown,
@@ -262,7 +263,16 @@ export function NewsSection() {
       ) : error ? (
         <p className="mt-8 text-center text-sm text-red-600">{error}</p>
       ) : items.length === 0 ? (
-        <p className="mt-40 text-center text-gray-400 text-3xl">검색 결과가 없습니다.</p>
+        <div className="mt-40 flex flex-col items-center gap-4">
+          <p className="text-center text-gray-400 text-3xl">검색 결과가 없습니다.</p>
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 text-sm font-medium text-[#0b1b3a] hover:text-[#132a56] hover:underline"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            뉴스 페이지로 돌아가기
+          </Link>
+        </div>
       ) : (
         <>
           {featured && (

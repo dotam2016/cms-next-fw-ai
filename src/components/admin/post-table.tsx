@@ -395,6 +395,7 @@ export function PostTable() {
         <div className="flex-1" />
 
         {/* Center: Pagination */}
+        {total > 0 && (
         <div className="flex items-center gap-1 justify-center">
           {pageCount > 1 && (
           <Button
@@ -435,6 +436,7 @@ export function PostTable() {
           </Button>
           )}
         </div>
+        )}
 
         {/* Right: Actions */}
         <div className="flex flex-1 justify-end items-center gap-2">
