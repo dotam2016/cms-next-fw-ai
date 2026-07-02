@@ -42,6 +42,11 @@ export interface ListNewsParams {
   page_size?: number
 }
 
+export interface UpdateNewsPayload {
+  title?: string
+  content_html?: string | null
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
 async function parseErrorMessage(response: Response): Promise<string> {
@@ -86,6 +91,30 @@ export async function listNews(params: ListNewsParams = {}): Promise<PaginatedNe
 
   const queryString = query.toString()
   const response = await fetch(`${API_BASE_URL}/news${queryString ? `?${queryString}` : ''}`)
+
+  if (!response.ok) {
+    throw new Error(await parseErrorMessage(response))
+  }
+
+  return response.json()
+}
+
+export async function getNews(id: number): Promise<NewsOut> {
+  const response = await fetch(`${API_BASE_URL}/news/${id}`)
+
+  if (!response.ok) {
+    throw new Error(await parseErrorMessage(response))
+  }
+
+  return response.json()
+}
+
+export async function updateNews(id: number, payload: UpdateNewsPayload): Promise<NewsOut> {
+  const response = await fetch(`${API_BASE_URL}/news/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
 
   if (!response.ok) {
     throw new Error(await parseErrorMessage(response))
