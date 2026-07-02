@@ -1,14 +1,16 @@
 'use client'
 
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import Editor from '@/components/ui/editor'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { postFormSchema, type PostFormValues } from '@/lib/validations/post'
+
+const Editor = dynamic(() => import('@/components/ui/editor'), { ssr: false })
 
 interface PostFormProps {
   defaultValues?: Partial<PostFormValues>
