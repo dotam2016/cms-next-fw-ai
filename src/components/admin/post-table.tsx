@@ -68,6 +68,21 @@ const columns: ColumnDef<NewsListItem>[] = [
     size: 40,
   },
   {
+    id: 'image',
+    header: '이미지',
+    cell: ({ row }) => (
+      <div className="flex justify-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`https://picsum.photos/id/${row.original.id}/600/400`}
+          alt=""
+          className="h-14 w-20 rounded-md object-cover"
+        />
+      </div>
+    ),
+    size: 96,
+  },
+  {
     accessorKey: 'title',
     header: '제목',
     cell: ({ row }) => (
