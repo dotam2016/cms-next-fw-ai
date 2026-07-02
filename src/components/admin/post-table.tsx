@@ -30,7 +30,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { listNews, type NewsListItem } from '@/lib/api/news'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { toast } from 'sonner'
+import { deleteNews, listNews, type NewsListItem } from '@/lib/api/news'
 
 const columns: ColumnDef<NewsListItem>[] = [
   {
@@ -124,6 +133,9 @@ export function PostTable() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [refreshToken, setRefreshToken] = useState(0)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     setSearchValue(q)
@@ -176,7 +188,36 @@ export function PostTable() {
     return () => {
       cancelled = true
     }
-  }, [q, dateFrom, dateTo, page, pageSize])
+  }, [q, dateFrom, dateTo, page, pageSize, refreshToken])
+
+  const selectedIds = Object.keys(rowSelection).map((key) => items[Number(key)]?.id).filter((id): id is number => id !== undefined)
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    try {
+      const results = await Promise.allSettled(selectedIds.map((id) => deleteNews(id)))
+      const succeeded = results.filter((r) => r.status === 'fulfilled').length
+      const failed = results.length - succeeded
+
+      if (succeeded > 0) {
+        toast.success(`${succeeded}개의 게시글이 삭제되었습니다.`)
+      }
+      if (failed > 0) {
+        toast.error(`${failed}개의 게시글을 삭제하지 못했습니다.`)
+      }
+
+      setDeleteDialogOpen(false)
+      setRowSelection({})
+
+      if (selectedIds.length === items.length && page > 1) {
+        updateParams({ page: String(page - 1) })
+      } else {
+        setRefreshToken((t) => t + 1)
+      }
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   const table = useReactTable({
     data: items,
@@ -187,7 +228,6 @@ export function PostTable() {
     enableRowSelection: true,
   })
 
-  const selectedIds = Object.keys(rowSelection)
   const pageCount = Math.max(1, Math.ceil(total / pageSize))
 
   return (
@@ -372,6 +412,7 @@ export function PostTable() {
             variant="outline"
             size="sm"
             disabled={selectedIds.length === 0}
+            onClick={() => setDeleteDialogOpen(true)}
             className={cn(
               "text-xs px-4 h-9 rounded-md transition-colors w-30",
               selectedIds.length === 0
@@ -392,6 +433,36 @@ export function PostTable() {
           </Link>
         </div>
       </div>
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>게시글 삭제</DialogTitle>
+            <DialogDescription>
+              선택한 {selectedIds.length}개의 게시글을 삭제하시겠습니까? 삭제된 게시글은 목록에서 숨겨지며, 복구는 관리자에게 문의해주세요.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={deleting}
+              onClick={() => setDeleteDialogOpen(false)}
+              className="border-gray-200 text-xs px-4 h-9 rounded-md bg-white text-gray-700 hover:bg-gray-50"
+            >
+              취소
+            </Button>
+            <Button
+              size="sm"
+              disabled={deleting}
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700 text-white text-xs px-4 h-9 rounded-md font-medium disabled:opacity-60"
+            >
+              {deleting ? '삭제 중...' : '삭제'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

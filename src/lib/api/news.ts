@@ -126,3 +126,13 @@ export async function updateNews(id: number, payload: UpdateNewsPayload): Promis
 
   return response.json()
 }
+
+export async function deleteNews(id: number): Promise<NewsOut> {
+  const response = await fetch(`${API_BASE_URL}/news/${id}`, { method: 'DELETE' })
+
+  if (!response.ok) {
+    throw new Error(await parseErrorMessage(response))
+  }
+
+  return response.json()
+}
