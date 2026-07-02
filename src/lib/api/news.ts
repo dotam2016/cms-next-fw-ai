@@ -2,6 +2,7 @@ export interface NewsOut {
   id: number
   source_id: number | null
   title: string
+  description: string | null
   url: string | null
   content_html: string | null
   published_at: string | null
@@ -14,6 +15,7 @@ export interface NewsOut {
 
 export interface CreateNewsPayload {
   title: string
+  description: string
   content_html?: string | null
 }
 
@@ -21,6 +23,7 @@ export interface NewsListItem {
   id: number
   source_id: number | null
   title: string
+  description: string | null
   url: string | null
   published_at: string | null
   view_count: number
@@ -44,6 +47,7 @@ export interface ListNewsParams {
 
 export interface UpdateNewsPayload {
   title?: string
+  description?: string
   content_html?: string | null
 }
 

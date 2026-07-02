@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { postFormSchema, type PostFormValues } from '@/lib/validations/post'
 
@@ -23,11 +24,14 @@ export function PostForm({ defaultValues, onSubmit, submitLabel = '등록' }: Po
     register,
     control,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<PostFormValues>({
     resolver: zodResolver(postFormSchema),
-    defaultValues: { title: '', content: '', ...defaultValues },
+    defaultValues: { title: '', description: '', content: '', ...defaultValues },
   })
+
+  const descriptionLength = watch('description')?.length ?? 0
 
   return (
     <form
@@ -46,6 +50,29 @@ export function PostForm({ defaultValues, onSubmit, submitLabel = '등록' }: Po
           {...register('title')}
         />
         {errors.title && <p className="text-sm text-red-600">{errors.title.message}</p>}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="description" className="text-sm font-medium text-gray-700">
+          설명 *
+        </Label>
+        <Textarea
+          id="description"
+          rows={3}
+          maxLength={200}
+          placeholder="설명을 입력해주세요"
+          aria-invalid={!!errors.description}
+          className="border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md"
+          {...register('description')}
+        />
+        <div className="flex items-center justify-between">
+          {errors.description ? (
+            <p className="text-sm text-red-600">{errors.description.message}</p>
+          ) : (
+            <span />
+          )}
+          <span className="text-xs text-gray-400">{descriptionLength}/200</span>
+        </div>
       </div>
 
       <div className="flex flex-col gap-2">

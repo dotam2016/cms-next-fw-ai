@@ -13,6 +13,7 @@ export default function AdminPostCreatePage() {
     try {
       await createNews({
         title: values.title,
+        description: values.description,
         content_html: values.content?.trim() ? values.content : null,
       })
       toast.success('게시글이 등록되었습니다.')

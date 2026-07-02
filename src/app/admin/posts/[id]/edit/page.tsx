@@ -26,7 +26,11 @@ export default function AdminPostEditPage() {
       try {
         const news = await getNews(id)
         if (cancelled) return
-        setDefaultValues({ title: news.title, content: news.content_html ?? '' })
+        setDefaultValues({
+          title: news.title,
+          description: news.description ?? '',
+          content: news.content_html ?? '',
+        })
       } catch (err) {
         if (cancelled) return
         setError(err instanceof Error ? err.message : '게시글을 불러오지 못했습니다.')
@@ -45,6 +49,7 @@ export default function AdminPostEditPage() {
     try {
       await updateNews(id, {
         title: values.title,
+        description: values.description,
         content_html: values.content?.trim() ? values.content : null,
       })
       toast.success('게시글이 수정되었습니다.')
