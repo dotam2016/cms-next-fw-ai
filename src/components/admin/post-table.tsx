@@ -56,7 +56,7 @@ const columns: ColumnDef<NewsListItem>[] = [
         aria-label="Select row"
       />
     ),
-    size: 48,
+    size: 40,
   },
   {
     accessorKey: 'title',
@@ -64,6 +64,15 @@ const columns: ColumnDef<NewsListItem>[] = [
     cell: ({ row }) => (
       <p className="line-clamp-2 text-sm leading-relaxed text-foreground">
         {row.getValue<string>('title')}
+      </p>
+    ),
+  },
+  {
+    accessorKey: 'description',
+    header: '설명',
+    cell: ({ row }) => (
+      <p className="line-clamp-2 text-sm leading-relaxed text-foreground">
+        {row.getValue<string>('description')}
       </p>
     ),
   },
@@ -242,8 +251,12 @@ export function PostTable() {
                   <TableHead
                     key={header.id}
                     className={cn(
-                      'py-3.5 px-4 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0',
-                      header.column.id === 'title' ? 'text-left' : 'text-center'
+                      'py-3.5 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0',
+                      header.column.id === 'select'
+                        ? 'px-2 text-center'
+                        : header.column.id === 'title'
+                          ? 'px-4 text-left'
+                          : 'px-4 text-center'
                     )}
                     style={{ width: header.column.columnDef.size }}
                   >
@@ -288,8 +301,12 @@ export function PostTable() {
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        'py-3.5 px-4 align-middle border-r border-gray-200 last:border-r-0',
-                        cell.column.id === 'title' ? 'text-left' : 'text-center'
+                        'py-3.5 align-middle border-r border-gray-200 last:border-r-0',
+                        cell.column.id === 'select'
+                          ? 'px-2 text-center'
+                          : cell.column.id === 'title'
+                            ? 'px-4 text-left'
+                            : 'px-4 text-center'
                       )}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
