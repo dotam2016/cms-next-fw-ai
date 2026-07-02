@@ -20,3 +20,7 @@
   /* Màu border ở chế độ Tối (Ví dụ màu xám tối) */
   --border: 240 3.7% 15.9%;
 }
+
+.ck.ck-content.ck-editor__editable {
+  height: 600px !important;
+}

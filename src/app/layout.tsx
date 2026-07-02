@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="en" className={cn(geistSans.variable, geistMono.variable, "font-sans", inter.variable)}>
       <body>
         {children}
-        <Toaster />
+        <Toaster position="top-right" />
       </body>
     </html>
   );

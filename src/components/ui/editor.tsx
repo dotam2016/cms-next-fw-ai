@@ -16,6 +16,8 @@ import {
 
 import 'ckeditor5/ckeditor5.css'
 
+const LICENSE_KEY = "GPL";
+
 interface EditorProps {
   value: string
   onChange: (value: string) => void
@@ -35,7 +37,8 @@ export default function Editor({ value, onChange, placeholder }: EditorProps) {
             'bold', 'italic', '|',
             'link', 'bulletedList', 'numberedList'
           ],
-          placeholder: placeholder
+          placeholder: placeholder,
+          licenseKey: LICENSE_KEY,
         }}
         data={value}
         onChange={(event, editor) => {

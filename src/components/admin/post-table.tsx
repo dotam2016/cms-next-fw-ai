@@ -435,11 +435,11 @@ export function PostTable() {
       </div>
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>게시글 삭제</DialogTitle>
             <DialogDescription>
-              선택한 {selectedIds.length}개의 게시글을 삭제하시겠습니까? 삭제된 게시글은 목록에서 숨겨지며, 복구는 관리자에게 문의해주세요.
+              선택한 {selectedIds.length}개의 게시글을 삭제하시겠습니까? <br />삭제된 게시글은 목록에서 숨겨지며.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -448,7 +448,7 @@ export function PostTable() {
               size="sm"
               disabled={deleting}
               onClick={() => setDeleteDialogOpen(false)}
-              className="border-gray-200 text-xs px-4 h-9 rounded-md bg-white text-gray-700 hover:bg-gray-50"
+              className="border-gray-200 text-xs px-4 h-9 rounded-md bg-white text-gray-700 hover:bg-gray-50 min-w-30"
             >
               취소
             </Button>
@@ -456,7 +456,7 @@ export function PostTable() {
               size="sm"
               disabled={deleting}
               onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700 text-white text-xs px-4 h-9 rounded-md font-medium disabled:opacity-60"
+              className="bg-violet-600 hover:bg-violet-700 text-white text-xs px-4 h-9 rounded-md font-medium disabled:opacity-60 min-w-30"
             >
               {deleting ? '삭제 중...' : '삭제'}
             </Button>
