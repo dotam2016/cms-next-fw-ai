@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
+import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
 import { PostForm } from '@/components/admin/post-form'
 import { getNews, setTrending, updateNews } from '@/lib/api/news'
@@ -14,6 +15,7 @@ export default function AdminPostEditPage() {
   const id = Number(params.id)
 
   const [defaultValues, setDefaultValues] = useState<PostFormValues | null>(null)
+  const [createdAt, setCreatedAt] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -32,6 +34,7 @@ export default function AdminPostEditPage() {
           content: news.content_html ?? '',
           is_trending: news.is_trending,
         })
+        setCreatedAt(news.published_at ?? news.crawled_at)
       } catch (err) {
         if (cancelled) return
         setError(err instanceof Error ? err.message : '게시글을 불러오지 못했습니다.')
@@ -65,13 +68,20 @@ export default function AdminPostEditPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold tracking-tight">블로그 & 뉴스 글 수정</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold tracking-tight">블로그 & 뉴스 글 수정</h1>
+        {createdAt && (
+          <span className="text-sm text-muted-foreground">
+            created: {format(parseISO(createdAt), 'yyyy-MM-dd HH:mm:ss')}
+          </span>
+        )}
+      </div>
       {loading ? (
         <p className="text-sm text-muted-foreground">불러오는 중...</p>
       ) : error ? (
-        <div className="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white p-6">
+        <div className="flex flex-col gap-3 rounded-lg bg-white p-6">
           <p className="text-sm text-red-600">{error}</p>
-          <Link href="/admin/posts" className="w-fit text-sm text-violet-600 hover:underline">
+          <Link href="/admin/posts" className="w-fit text-sm text-[#0b1b3a] hover:underline">
             목록으로 돌아가기
           </Link>
         </div>

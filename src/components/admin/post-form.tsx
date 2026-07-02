@@ -46,7 +46,7 @@ export function PostForm({ defaultValues, onSubmit, submitLabel = '등록' }: Po
           id="title"
           placeholder="제목을 입력해주세요"
           aria-invalid={!!errors.title}
-          className="border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md"
+          className="border-gray-200 focus-visible:ring-[#0b1b3a] focus-visible:border-[#0b1b3a] rounded-md"
           {...register('title')}
         />
         {errors.title && <p className="text-sm text-red-600">{errors.title.message}</p>}
@@ -62,7 +62,7 @@ export function PostForm({ defaultValues, onSubmit, submitLabel = '등록' }: Po
           maxLength={200}
           placeholder="설명을 입력해주세요"
           aria-invalid={!!errors.description}
-          className="border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md"
+          className="border-gray-200 focus-visible:ring-[#0b1b3a] focus-visible:border-[#0b1b3a] rounded-md"
           {...register('description')}
         />
         <div className="flex items-center justify-between">
@@ -88,24 +88,24 @@ export function PostForm({ defaultValues, onSubmit, submitLabel = '등록' }: Po
         />
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* <div className="flex items-center gap-2">
         <input
           id="is_trending"
           type="checkbox"
-          className="h-4 w-4 cursor-pointer accent-violet-600"
+          className="h-4 w-4 cursor-pointer accent-[#0b1b3a]"
           {...register('is_trending')}
         />
         <Label htmlFor="is_trending" className="text-sm font-medium text-gray-700 cursor-pointer">
           Bài viết nổi bật
         </Label>
-      </div>
+      </div> */}
 
       <div className="flex items-center justify-end gap-2 pt-2">
         <Link
           href="/admin/posts"
           className={cn(
             buttonVariants({ variant: 'outline', size: 'sm' }),
-            'border-gray-200 text-xs px-4 h-9 bg-white hover:bg-gray-50 text-gray-700 font-medium shadow-none'
+            'border-gray-200 text-xs px-4 h-9 bg-white hover:bg-gray-50 text-gray-700 font-medium shadow-none w-30'
           )}
         >
           취소
@@ -114,7 +114,7 @@ export function PostForm({ defaultValues, onSubmit, submitLabel = '등록' }: Po
           type="submit"
           size="sm"
           disabled={isSubmitting}
-          className="bg-violet-600 hover:bg-violet-700 text-white text-xs px-4 h-9 rounded-md font-medium disabled:opacity-60"
+          className="bg-[#0b1b3a] hover:bg-[#132a56] text-white text-xs px-4 h-9 rounded-md font-medium disabled:opacity-60 w-30"
         >
           {isSubmitting ? '저장 중...' : submitLabel}
         </Button>

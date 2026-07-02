@@ -32,7 +32,7 @@ export function AdminBreadcrumb() {
         {crumbLabel && (
           <>
             <ChevronRight className="h-3.5 w-3.5" />
-            <span className="font-semibold text-violet-600">{crumbLabel}</span>
+            <span className="font-semibold text-[#0b1b3a]">{crumbLabel}</span>
           </>
         )}
       </nav>

@@ -40,6 +40,20 @@ import {
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { deleteNews, listNews, type NewsListItem } from '@/lib/api/news'
+import { Skeleton } from '@/components/ui/skeleton'
+
+const SKELETON_COLUMN_IDS = ['select', 'image', 'title', 'description', 'published_at', 'actions'] as const
+
+function getCellClassName(id: string) {
+  return cn(
+    'py-3.5 align-middle border-r border-gray-200 last:border-r-0',
+    id === 'select' || id === 'image'
+      ? 'px-0 text-center'
+      : id === 'title' || id === 'description'
+        ? 'px-4 text-left whitespace-normal break-words'
+        : 'px-4 text-center'
+  )
+}
 
 const columns: ColumnDef<NewsListItem>[] = [
   {
@@ -47,7 +61,7 @@ const columns: ColumnDef<NewsListItem>[] = [
     header: ({ table }) => (
       <input
         type="checkbox"
-        className="h-4 w-4 cursor-pointer accent-violet-600"
+        className="h-4 w-4 cursor-pointer accent-[#0b1b3a]"
         checked={table.getIsAllPageRowsSelected()}
         ref={(el) => {
           if (el) el.indeterminate = table.getIsSomePageRowsSelected()
@@ -59,13 +73,13 @@ const columns: ColumnDef<NewsListItem>[] = [
     cell: ({ row }) => (
       <input
         type="checkbox"
-        className="h-4 w-4 cursor-pointer accent-violet-600"
+        className="h-4 w-4 cursor-pointer accent-[#0b1b3a]"
         checked={row.getIsSelected()}
         onChange={(e) => row.toggleSelected(e.target.checked)}
         aria-label="Select row"
       />
     ),
-    size: 40,
+    size: 20,
   },
   {
     id: 'image',
@@ -76,11 +90,11 @@ const columns: ColumnDef<NewsListItem>[] = [
         <img
           src={`https://picsum.photos/id/${row.original.id}/600/400`}
           alt=""
-          className="h-14 w-20 rounded-md object-cover"
+          className="h-[120px] w-[120px] rounded-md object-cover"
         />
       </div>
     ),
-    size: 96,
+    size: 120,
   },
   {
     accessorKey: 'title',
@@ -99,6 +113,7 @@ const columns: ColumnDef<NewsListItem>[] = [
         {row.getValue<string>('description')}
       </p>
     ),
+    size: 240,
   },
   {
     accessorKey: 'published_at',
@@ -111,7 +126,7 @@ const columns: ColumnDef<NewsListItem>[] = [
         </span>
       )
     },
-    size: 180,
+    size: 80,
   },
   {
     id: 'actions',
@@ -253,6 +268,7 @@ export function PostTable() {
         <SearchInput
           value={searchValue}
           onValueChange={setSearchValue}
+          placeholder="제목으로 검색"
           onSearch={() => updateParams({ q: searchValue || null, page: null })}
           onClear={() => {
             setSearchValue('')
@@ -281,11 +297,11 @@ export function PostTable() {
         <p className="text-sm text-gray-700">
           전체 <span className="font-bold text-gray-900">{total}</span>
         </p>
-        <Select
+        {/* <Select
           value={String(pageSize)}
           onValueChange={(val) => updateParams({ page_size: val, page: null })}
         >
-          <SelectTrigger className="h-9 w-32 text-xs border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md">
+          <SelectTrigger className="h-9 w-32 text-xs border-gray-200 focus-visible:ring-[#0b1b3a] focus-visible:border-[#0b1b3a] rounded-md">
             {pageSize}개씩 보기
           </SelectTrigger>
           <SelectContent>
@@ -293,12 +309,12 @@ export function PostTable() {
             <SelectItem value="20">20개씩 보기</SelectItem>
             <SelectItem value="50">50개씩 보기</SelectItem>
           </SelectContent>
-        </Select>
+        </Select> */}
       </div>
 
       {/* Table */}
       <div className="overflow-hidden rounded-lg border border-gray-200">
-        <Table>
+        <Table className="table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="bg-gray-50 hover:bg-gray-50 border-b border-gray-200 border-collapse">
@@ -307,8 +323,8 @@ export function PostTable() {
                     key={header.id}
                     className={cn(
                       'py-3.5 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0',
-                      header.column.id === 'select'
-                        ? 'px-2 text-center'
+                      header.column.id === 'select' || header.column.id === 'image'
+                        ? 'px-0 text-center'
                         : header.column.id === 'title'
                           ? 'px-4 text-left'
                           : 'px-4 text-center'
@@ -331,11 +347,20 @@ export function PostTable() {
                 </TableCell>
               </TableRow>
             ) : loading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-32 text-center text-sm text-muted-foreground">
-                  불러오는 중...
-                </TableCell>
-              </TableRow>
+              Array.from({ length: pageSize }).map((_, i) => (
+                <TableRow key={`skeleton-${i}`} className="border-b border-gray-200 last:border-b-0">
+                  {SKELETON_COLUMN_IDS.map((id) => (
+                    <TableCell key={id} className={getCellClassName(id)}>
+                      {id === 'select' && <Skeleton className="mx-auto h-4 w-4 rounded-sm" />}
+                      {id === 'image' && <Skeleton className="mx-auto h-[120px] w-[120px]" />}
+                      {id === 'title' && <Skeleton className="h-4 w-3/4" />}
+                      {id === 'description' && <Skeleton className="h-4 w-full" />}
+                      {id === 'published_at' && <Skeleton className="mx-auto h-4 w-16" />}
+                      {id === 'actions' && <Skeleton className="mx-auto h-8 w-16" />}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
             ) : table.getRowModel().rows.length === 0 ? (
               <TableRow>
                 <TableCell
@@ -353,17 +378,7 @@ export function PostTable() {
                   className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50/50"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(
-                        'py-3.5 align-middle border-r border-gray-200 last:border-r-0',
-                        cell.column.id === 'select'
-                          ? 'px-2 text-center'
-                          : cell.column.id === 'title'
-                            ? 'px-4 text-left'
-                            : 'px-4 text-center'
-                      )}
-                    >
+                    <TableCell key={cell.id} className={getCellClassName(cell.column.id)}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -400,7 +415,7 @@ export function PostTable() {
               className={cn(
                 'rounded-md h-8 w-8 text-sm font-medium transition-colors',
                 page - 1 === i
-                  ? 'bg-violet-600 hover:bg-violet-700 text-white'
+                  ? 'bg-[#0b1b3a] hover:bg-[#132a56] text-white'
                   : 'text-gray-600 hover:bg-gray-100'
               )}
               onClick={() => updateParams({ page: String(i + 1) })}
@@ -441,7 +456,7 @@ export function PostTable() {
             href="/admin/posts/create"
             className={cn(
               buttonVariants({ size: 'sm' }),
-              'bg-violet-600 hover:bg-violet-700 text-white text-xs px-4 h-9 rounded-md transition-colors w-30'
+              'bg-[#0b1b3a] hover:bg-[#132a56] text-white text-xs px-4 h-9 rounded-md transition-colors w-30'
             )}
           >
             등록
@@ -471,7 +486,7 @@ export function PostTable() {
               size="sm"
               disabled={deleting}
               onClick={handleDelete}
-              className="bg-violet-600 hover:bg-violet-700 text-white text-xs px-4 h-9 rounded-md font-medium disabled:opacity-60 min-w-30"
+              className="bg-[#0b1b3a] hover:bg-[#132a56] text-white text-xs px-4 h-9 rounded-md font-medium disabled:opacity-60 min-w-30"
             >
               {deleting ? '삭제 중...' : '삭제'}
             </Button>

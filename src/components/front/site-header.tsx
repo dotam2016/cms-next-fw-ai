@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link'
 import { ChevronDown, Globe, Mail, Search } from 'lucide-react'
 
@@ -19,7 +20,7 @@ export function SiteHeader() {
           <Link href="#" className="hover:text-white">Sitemap</Link>
           <Link href="#" className="hover:text-white">Accessibility</Link>
           <Globe className="h-3.5 w-3.5" />
-          <span>EN / 日本語</span>
+          <span>EN / KR</span>
         </div>
       </div>
 
@@ -28,13 +29,7 @@ export function SiteHeader() {
         <div className="mx-auto flex h-20 max-w-[1400px] items-center justify-between px-6">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-md bg-[#0B1B3A] text-sm font-bold text-white">
-              KEL
-            </span>
-            <span className="flex flex-col leading-tight">
-              <span className="text-base font-bold text-gray-900">KEL Corporation</span>
-              <span className="text-[11px] tracking-wide text-gray-400">SINCE 1966</span>
-            </span>
+            <img src="/logo_2.png" alt="Logo" style={{width:"120px"}}/>
           </Link>
 
           {/* Nav links */}

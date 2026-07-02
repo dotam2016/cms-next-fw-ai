@@ -35,7 +35,7 @@ export function SearchInput({
         onChange={(e) => onValueChange(e.target.value)}
         onKeyDown={handleKeyDown}
         className={cn(
-          "h-10 w-72 pr-16 border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md",
+          "h-10 w-72 pr-16 border-gray-200 focus-visible:ring-[#0b1b3a] focus-visible:border-[#0b1b3a] rounded-md",
           className
         )}
         {...props}

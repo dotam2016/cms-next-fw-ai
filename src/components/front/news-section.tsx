@@ -3,23 +3,87 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Search, X } from 'lucide-react'
+import {
+  ArrowDownWideNarrow,
+  ArrowRight,
+  ArrowUpWideNarrow,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  X,
+} from 'lucide-react'
 import { listNews, type NewsListItem } from '@/lib/api/news'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const PAGE_SIZE = 7
 const CURRENT_YEAR = new Date().getFullYear()
 const YEAR_OPTIONS = Array.from({ length: 6 }, (_, i) => CURRENT_YEAR - i)
+const SORT_OPTIONS = [
+  { value: 'latest', label: '최신순', icon: ArrowDownWideNarrow },
+  { value: 'oldest', label: '오래된순', icon: ArrowUpWideNarrow },
+] as const
 
 function formatDate(dateString: string | null) {
   if (!dateString) return '-'
   return dateString.slice(0, 10).replace(/-/g, '.')
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function HighlightText({ text, query }: { text: string; query: string }) {
+  const trimmed = query.trim()
+  if (!trimmed) return <>{text}</>
+  const parts = text.split(new RegExp(`(${escapeRegExp(trimmed)})`, 'gi'))
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === trimmed.toLowerCase() ? (
+          <mark key={i} className="bg-yellow-200 text-gray-900">
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  )
+}
+
 function FeaturedBadge() {
   return (
     <span className="absolute left-3 top-3 rounded bg-black/60 px-2 py-1 text-[10px] font-semibold tracking-wide text-white">
-      PRESS RELEASE
+      Featured News
     </span>
+  )
+}
+
+function FeaturedSkeleton() {
+  return (
+    <div className="mt-4 flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white sm:flex-row">
+      <Skeleton className="h-56 w-full shrink-0 rounded-none sm:h-auto sm:w-72" />
+      <div className="flex flex-1 flex-col justify-center gap-3 p-6">
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-2/3" />
+      </div>
+    </div>
+  )
+}
+
+function NewsCardSkeleton() {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <Skeleton className="h-44 w-full shrink-0 rounded-none" />
+      <div className="flex flex-1 flex-col gap-2 p-5">
+        <Skeleton className="h-3 w-16" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-2/3" />
+      </div>
+    </div>
   )
 }
 
@@ -30,6 +94,7 @@ export function NewsSection() {
 
   const q = searchParams.get('q') ?? ''
   const year = searchParams.get('year') ?? ''
+  const sort = searchParams.get('sort') === 'oldest' ? 'oldest' : 'latest'
   const page = Number(searchParams.get('page') ?? '1')
 
   const [searchValue, setSearchValue] = useState(q)
@@ -71,6 +136,7 @@ export function NewsSection() {
           q: q || undefined,
           date_from: year ? `${year}-01-01T00:00:00` : undefined,
           date_to: year ? `${year}-12-31T23:59:59` : undefined,
+          sort,
           page,
           page_size: PAGE_SIZE,
         })
@@ -91,10 +157,12 @@ export function NewsSection() {
     return () => {
       cancelled = true
     }
-  }, [q, year, page])
+  }, [q, year, sort, page])
 
-  const featured = items[0]
-  const gridItems = items.slice(1)
+  const isSearching = q.trim().length > 0
+  const showFeatured = !isSearching && page === 1
+  const featured = showFeatured ? items[0] : undefined
+  const gridItems = showFeatured ? items.slice(1) : items
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
   return (
@@ -102,9 +170,9 @@ export function NewsSection() {
       {/* Page header */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">News &amp; Media</h1>
+          <h1 className="text-3xl font-bold text-gray-900">뉴스 &amp; 미디어</h1>
           <p className="mt-2 text-sm text-gray-500">
-            Press releases, product announcements, and corporate updates
+            보도자료, 제품 소식, 기업 소식을 확인하세요
           </p>
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
@@ -124,7 +192,7 @@ export function NewsSection() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleSearchSubmit()
               }}
-              placeholder="Search news..."
+              placeholder="제목으로 검색"
               className="h-10 w-full rounded-md border border-gray-200 bg-white pl-9 pr-8 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-[#1D4ED8]"
             />
             {searchValue && (
@@ -157,10 +225,40 @@ export function NewsSection() {
         </div>
       </div>
 
+      <div className="mt-3 flex items-center justify-end gap-4 mb-15">
+        {SORT_OPTIONS.map(({ value, label, icon: Icon }) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => updateParams({ sort: value === 'latest' ? null : value, page: null })}
+            className={
+              sort === value
+                ? 'flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-[#1D4ED8]'
+                : 'flex cursor-pointer items-center gap-1.5 text-xs font-medium text-gray-400 hover:text-gray-600'
+            }
+          >
+            <Icon className="h-3.5 w-3.5" />
+            {label}
+          </button>
+        ))}
+      </div>
       <hr className="mt-8 border-gray-200" />
 
+      {isSearching && !loading && !error && (
+        <p className="mt-4 text-sm text-gray-500">
+          검색 결과 <span className="font-bold text-[#1D4ED8]">{total}</span>건이 있습니다.
+        </p>
+      )}
+
       {loading ? (
-        <p className="mt-8 text-center text-sm text-gray-400">불러오는 중...</p>
+        <>
+          {showFeatured && <FeaturedSkeleton />}
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: showFeatured ? PAGE_SIZE - 1 : PAGE_SIZE }, (_, i) => (
+              <NewsCardSkeleton key={i} />
+            ))}
+          </div>
+        </>
       ) : error ? (
         <p className="mt-8 text-center text-sm text-red-600">{error}</p>
       ) : items.length === 0 ? (
@@ -174,7 +272,7 @@ export function NewsSection() {
                 FEATURED
               </div>
               <Link
-                href="#"
+                href={`/news/${featured.id}`}
                 className="mt-4 flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow hover:shadow-md sm:flex-row"
               >
                 <div className="relative h-56 w-full shrink-0 sm:h-auto sm:w-72">
@@ -184,7 +282,7 @@ export function NewsSection() {
                     alt=""
                     className="h-full w-full object-cover"
                   />
-                  <FeaturedBadge />
+                  {/* <FeaturedBadge /> */}
                 </div>
                 <div className="flex flex-col justify-center gap-2 p-6">
                   <span className="text-xs text-gray-400">
@@ -205,7 +303,7 @@ export function NewsSection() {
               {gridItems.map((item) => (
                 <Link
                   key={item.id}
-                  href="#"
+                  href={`/news/${item.id}`}
                   className="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow hover:shadow-md"
                 >
                   <div className="relative h-44 w-full shrink-0">
@@ -220,9 +318,13 @@ export function NewsSection() {
                     <span className="text-xs text-gray-400">
                       {formatDate(item.published_at ?? item.crawled_at)}
                     </span>
-                    <h3 className="line-clamp-2 text-base font-bold text-gray-900">{item.title}</h3>
+                    <h3 className="line-clamp-2 text-base font-bold text-gray-900">
+                      <HighlightText text={item.title} query={q} />
+                    </h3>
                     {item.description && (
-                      <p className="line-clamp-2 text-sm text-gray-500">{item.description}</p>
+                      <p className="line-clamp-2 text-sm text-gray-500">
+                        <HighlightText text={item.description} query={q} />
+                      </p>
                     )}
                     <span className="mt-auto flex items-center gap-1 pt-2 text-sm font-medium text-[#1D4ED8]">
                       Read More <ArrowRight className="h-4 w-4" />
@@ -236,19 +338,17 @@ export function NewsSection() {
       )}
 
       {/* Pagination */}
-      {!loading && !error && total > 0 && (
+      {!loading && !error && pageCount > 1 && (
         <div className="mt-10 flex items-center justify-center gap-1">
-          {pageCount > 1 && (
-            <button
-              type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30"
-              aria-label="Previous page"
-              onClick={() => updateParams({ page: String(page - 1) })}
-              disabled={page <= 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-          )}
+          <button
+            type="button"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30"
+            aria-label="Previous page"
+            onClick={() => updateParams({ page: String(page - 1) })}
+            disabled={page <= 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
           {Array.from({ length: pageCount }, (_, i) => (
             <button
               key={i}
@@ -263,17 +363,15 @@ export function NewsSection() {
               {i + 1}
             </button>
           ))}
-          {pageCount > 1 && (
-            <button
-              type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30"
-              aria-label="Next page"
-              onClick={() => updateParams({ page: String(page + 1) })}
-              disabled={page >= pageCount}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          )}
+          <button
+            type="button"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30"
+            aria-label="Next page"
+            onClick={() => updateParams({ page: String(page + 1) })}
+            disabled={page >= pageCount}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
       )}
     </>

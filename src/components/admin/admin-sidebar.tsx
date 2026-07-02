@@ -16,7 +16,7 @@ import {
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { label: 'Main Home', href: '/', icon: Home },
+  { label: 'Main Home', href: '#none', icon: Home },
   { label: 'Blog & News', href: '/admin/posts', icon: Newspaper },
 ]
 
@@ -30,8 +30,8 @@ export function AdminSidebar({ open }: { open: boolean }) {
       {/* Logo */}
       <div className="flex flex-col h-screen">
         <div className="flex h-16 shrink-0 flex-col justify-center border-b px-6">
-          <p className="text-xl font-bold leading-none tracking-tight text-violet-700">
-            <img src="/logo_ad.png" alt="Logo"/>
+          <p className="text-xl font-bold leading-none tracking-tight text-[#0b1b3a]">
+            <img src="/logo.webp" alt="Logo" style={{width:"40px"}}/>
           </p>
           <p className="mt-1.5 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
             Contents Management System
@@ -53,14 +53,14 @@ export function AdminSidebar({ open }: { open: boolean }) {
                     className={cn(
                       'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                       isActive
-                        ? 'bg-violet-100 text-violet-700'
+                        ? 'bg-[#0b1b3a]/10 text-[#0b1b3a]'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     )}
                   >
                     <Icon
                       className={cn(
                         'h-4 w-4 shrink-0',
-                        isActive ? 'text-violet-600' : 'text-gray-400'
+                        isActive ? 'text-[#0b1b3a]' : 'text-gray-400'
                       )}
                     />
                     {label}

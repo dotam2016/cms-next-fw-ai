@@ -44,6 +44,7 @@ export interface ListNewsParams {
   q?: string
   date_from?: string
   date_to?: string
+  sort?: 'latest' | 'oldest'
   page?: number
   page_size?: number
 }
@@ -93,6 +94,7 @@ export async function listNews(params: ListNewsParams = {}): Promise<PaginatedNe
   if (params.q) query.set('q', params.q)
   if (params.date_from) query.set('date_from', params.date_from)
   if (params.date_to) query.set('date_to', params.date_to)
+  if (params.sort) query.set('sort', params.sort)
   if (params.page) query.set('page', String(params.page))
   if (params.page_size) query.set('page_size', String(params.page_size))
 
