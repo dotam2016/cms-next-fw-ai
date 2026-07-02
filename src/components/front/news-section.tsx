@@ -262,7 +262,7 @@ export function NewsSection() {
       ) : error ? (
         <p className="mt-8 text-center text-sm text-red-600">{error}</p>
       ) : items.length === 0 ? (
-        <p className="mt-8 text-center text-sm text-gray-400">검색 결과가 없습니다.</p>
+        <p className="mt-40 text-center text-gray-400 text-3xl">검색 결과가 없습니다.</p>
       ) : (
         <>
           {featured && (

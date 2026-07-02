@@ -88,7 +88,7 @@ export default function NewsDetailPage() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-[1400px] px-6 py-10">
+      <main className="mx-auto max-w-[1400px] px-6 py-10 pb-30">
         {loading ? (
           <p className="text-center text-sm text-gray-400">불러오는 중...</p>
         ) : error || !article ? (

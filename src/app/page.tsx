@@ -17,7 +17,7 @@ export default function Home() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-[1400px] px-6 py-10">
+      <main className="mx-auto max-w-[1400px] px-6 py-10 pb-30">
         <Suspense fallback={null}>
           <NewsSection />
         </Suspense>
