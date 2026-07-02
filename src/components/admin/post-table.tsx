@@ -1,30 +1,26 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   type ColumnDef,
-  type PaginationState,
   type RowSelectionState,
   useReactTable,
   getCoreRowModel,
-  getPaginationRowModel,
   flexRender,
 } from '@tanstack/react-table'
 import { format, parseISO, isBefore, isAfter, startOfDay, endOfDay } from 'date-fns'
 import Link from 'next/link'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button, buttonVariants } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { SearchInput } from '@/components/ui/search-input'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from '@/components/ui/select'
 import {
   Table,
@@ -34,9 +30,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { Post } from '@/lib/mock-data'
+import { listNews, type NewsListItem } from '@/lib/api/news'
 
-const columns: ColumnDef<Post>[] = [
+const columns: ColumnDef<NewsListItem>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -63,21 +59,6 @@ const columns: ColumnDef<Post>[] = [
     size: 48,
   },
   {
-    accessorKey: 'thumbnailUrl',
-    header: '썸네일 이미지',
-    cell: ({ row }) => (
-      <div className="flex justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={row.getValue<string>('thumbnailUrl')}
-          alt="thumbnail"
-          className="h-16 w-24 rounded-md object-cover"
-        />
-      </div>
-    ),
-    size: 120,
-  },
-  {
     accessorKey: 'title',
     header: '제목',
     cell: ({ row }) => (
@@ -87,29 +68,17 @@ const columns: ColumnDef<Post>[] = [
     ),
   },
   {
-    accessorKey: 'uploadedAt',
-    header: '업로드 일시',
-    cell: ({ row }) => (
-      <span className="whitespace-nowrap text-sm text-muted-foreground">
-        {format(parseISO(row.getValue<string>('uploadedAt')), 'yyyy-MM-dd HH:mm:ss')}
-      </span>
-    ),
-    size: 180,
-  },
-  {
-    accessorKey: 'status',
-    header: '게시',
+    accessorKey: 'published_at',
+    header: '게시 일시',
     cell: ({ row }) => {
-      const status = row.getValue<string>('status')
-      return status === 'published' ? (
-        <Badge className="bg-green-100 text-gray-900 border-none shadow-none px-3 py-2 font-normal text-[12px]">게시</Badge>
-      ) : (
-        <Badge className="bg-gray-100 text-gray-400 border-none shadow-none px-3 py-2 font-normal text-[12px]">
-          Draft
-        </Badge>
+      const publishedAt = row.getValue<string | null>('published_at')
+      return (
+        <span className="whitespace-nowrap text-sm text-muted-foreground">
+          {publishedAt ? format(parseISO(publishedAt), 'yyyy-MM-dd HH:mm:ss') : '-'}
+        </span>
       )
     },
-    size: 80,
+    size: 180,
   },
   {
     id: 'actions',
@@ -129,54 +98,88 @@ const columns: ColumnDef<Post>[] = [
   },
 ]
 
-// Reusable components are imported from @/components/ui/
+export function PostTable() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
-interface PostTableProps {
-  data: Post[]
-}
+  const q = searchParams.get('q') ?? ''
+  const dateFrom = searchParams.get('date_from') ?? ''
+  const dateTo = searchParams.get('date_to') ?? ''
+  const page = Number(searchParams.get('page') ?? '1')
+  const pageSize = Number(searchParams.get('page_size') ?? '20')
 
-export function PostTable({ data }: PostTableProps) {
+  const [searchValue, setSearchValue] = useState(q)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-  const [searchValue, setSearchValue] = useState('')
-  const [activeSearch, setActiveSearch] = useState('')
-  const [dateFrom, setDateFrom] = useState('')
-  const [dateTo, setDateTo] = useState('')
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 20,
-  })
+  const [items, setItems] = useState<NewsListItem[]>([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const filteredData = useMemo(() => {
-    return data.filter((post) => {
-      if (activeSearch && !post.title.toLowerCase().includes(activeSearch.toLowerCase())) {
-        return false
+  useEffect(() => {
+    setSearchValue(q)
+  }, [q])
+
+  const updateParams = useCallback(
+    (updates: Record<string, string | null>) => {
+      const next = new URLSearchParams(searchParams.toString())
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === null || value === '') {
+          next.delete(key)
+        } else {
+          next.set(key, value)
+        }
       }
-      if (dateFrom) {
-        const from = startOfDay(parseISO(dateFrom))
-        if (isBefore(parseISO(post.uploadedAt), from)) return false
+      router.push(`${pathname}?${next.toString()}`, { scroll: false })
+    },
+    [pathname, router, searchParams]
+  )
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function fetchNews() {
+      setLoading(true)
+      setError(null)
+      try {
+        const result = await listNews({
+          q: q || undefined,
+          date_from: dateFrom ? format(startOfDay(parseISO(dateFrom)), "yyyy-MM-dd'T'HH:mm:ss") : undefined,
+          date_to: dateTo ? format(endOfDay(parseISO(dateTo)), "yyyy-MM-dd'T'HH:mm:ss") : undefined,
+          page,
+          page_size: pageSize,
+        })
+        if (cancelled) return
+        setItems(result.items)
+        setTotal(result.total)
+        setRowSelection({})
+      } catch (err) {
+        if (cancelled) return
+        setError(err instanceof Error ? err.message : '목록을 불러오지 못했습니다.')
+        setItems([])
+        setTotal(0)
+      } finally {
+        if (!cancelled) setLoading(false)
       }
-      if (dateTo) {
-        const to = endOfDay(parseISO(dateTo))
-        if (isAfter(parseISO(post.uploadedAt), to)) return false
-      }
-      return true
-    })
-  }, [data, activeSearch, dateFrom, dateTo])
+    }
+
+    fetchNews()
+    return () => {
+      cancelled = true
+    }
+  }, [q, dateFrom, dateTo, page, pageSize])
 
   const table = useReactTable({
-    data: filteredData,
+    data: items,
     columns,
-    state: { rowSelection, pagination },
+    state: { rowSelection },
     onRowSelectionChange: setRowSelection,
-    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     enableRowSelection: true,
   })
 
   const selectedIds = Object.keys(rowSelection)
-  const pageCount = table.getPageCount()
-  const currentPageIndex = table.getState().pagination.pageIndex
+  const pageCount = Math.max(1, Math.ceil(total / pageSize))
 
   return (
     <div className="flex flex-col">
@@ -186,14 +189,10 @@ export function PostTable({ data }: PostTableProps) {
         <SearchInput
           value={searchValue}
           onValueChange={setSearchValue}
-          onSearch={() => {
-            setActiveSearch(searchValue)
-            setPagination((p) => ({ ...p, pageIndex: 0 }))
-          }}
+          onSearch={() => updateParams({ q: searchValue || null, page: null })}
           onClear={() => {
             setSearchValue('')
-            setActiveSearch('')
-            setPagination((p) => ({ ...p, pageIndex: 0 }))
+            updateParams({ q: null, page: null })
           }}
         />
 
@@ -201,19 +200,13 @@ export function PostTable({ data }: PostTableProps) {
         <div className="flex items-center gap-2">
           <DatePicker
             value={dateFrom}
-            onChange={(val) => {
-              setDateFrom(val)
-              setPagination((p) => ({ ...p, pageIndex: 0 }))
-            }}
+            onChange={(val) => updateParams({ date_from: val || null, page: null })}
             disabled={(date) => (dateTo ? isAfter(date, endOfDay(parseISO(dateTo))) : false)}
           />
           <span className="text-sm text-gray-400 font-medium">-</span>
           <DatePicker
             value={dateTo}
-            onChange={(val) => {
-              setDateTo(val)
-              setPagination((p) => ({ ...p, pageIndex: 0 }))
-            }}
+            onChange={(val) => updateParams({ date_to: val || null, page: null })}
             disabled={(date) => (dateFrom ? isBefore(date, startOfDay(parseISO(dateFrom))) : false)}
           />
         </div>
@@ -222,14 +215,14 @@ export function PostTable({ data }: PostTableProps) {
       {/* Count + page-size */}
       <div className="flex items-center justify-between mb-2.5">
         <p className="text-sm text-gray-700">
-          전체 <span className="font-bold text-gray-900">{filteredData.length}</span>
+          전체 <span className="font-bold text-gray-900">{total}</span>
         </p>
         <Select
-          value={String(pagination.pageSize)}
-          onValueChange={(val) => setPagination({ pageIndex: 0, pageSize: Number(val) })}
+          value={String(pageSize)}
+          onValueChange={(val) => updateParams({ page_size: val, page: null })}
         >
           <SelectTrigger className="h-9 w-32 text-xs border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md">
-            {pagination.pageSize}개씩 보기
+            {pageSize}개씩 보기
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="10">10개씩 보기</SelectItem>
@@ -263,7 +256,19 @@ export function PostTable({ data }: PostTableProps) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length === 0 ? (
+            {error ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-32 text-center text-sm text-red-600">
+                  {error}
+                </TableCell>
+              </TableRow>
+            ) : loading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-32 text-center text-sm text-muted-foreground">
+                  불러오는 중...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
@@ -309,8 +314,8 @@ export function PostTable({ data }: PostTableProps) {
             variant="ghost"
             size="icon-sm"
             className="rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-30 h-8 w-8"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => updateParams({ page: String(page - 1) })}
+            disabled={page <= 1}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -318,15 +323,15 @@ export function PostTable({ data }: PostTableProps) {
           {Array.from({ length: pageCount }, (_, i) => (
             <Button
               key={i}
-              variant={currentPageIndex === i ? 'default' : 'ghost'}
+              variant={page - 1 === i ? 'default' : 'ghost'}
               size="icon-sm"
               className={cn(
                 'rounded-md h-8 w-8 text-sm font-medium transition-colors',
-                currentPageIndex === i
+                page - 1 === i
                   ? 'bg-violet-600 hover:bg-violet-700 text-white'
                   : 'text-gray-600 hover:bg-gray-100'
               )}
-              onClick={() => table.setPageIndex(i)}
+              onClick={() => updateParams({ page: String(i + 1) })}
             >
               {i + 1}
             </Button>
@@ -336,8 +341,8 @@ export function PostTable({ data }: PostTableProps) {
             variant="ghost"
             size="icon-sm"
             className="rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-30 h-8 w-8"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => updateParams({ page: String(page + 1) })}
+            disabled={page >= pageCount}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

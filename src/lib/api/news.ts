@@ -17,6 +17,31 @@ export interface CreateNewsPayload {
   content_html?: string | null
 }
 
+export interface NewsListItem {
+  id: number
+  source_id: number | null
+  title: string
+  url: string | null
+  published_at: string | null
+  view_count: number
+  crawled_at: string
+}
+
+export interface PaginatedNews {
+  total: number
+  page: number
+  page_size: number
+  items: NewsListItem[]
+}
+
+export interface ListNewsParams {
+  q?: string
+  date_from?: string
+  date_to?: string
+  page?: number
+  page_size?: number
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
 async function parseErrorMessage(response: Response): Promise<string> {
@@ -43,6 +68,24 @@ export async function createNews(payload: CreateNewsPayload): Promise<NewsOut> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   })
+
+  if (!response.ok) {
+    throw new Error(await parseErrorMessage(response))
+  }
+
+  return response.json()
+}
+
+export async function listNews(params: ListNewsParams = {}): Promise<PaginatedNews> {
+  const query = new URLSearchParams()
+  if (params.q) query.set('q', params.q)
+  if (params.date_from) query.set('date_from', params.date_from)
+  if (params.date_to) query.set('date_to', params.date_to)
+  if (params.page) query.set('page', String(params.page))
+  if (params.page_size) query.set('page_size', String(params.page_size))
+
+  const queryString = query.toString()
+  const response = await fetch(`${API_BASE_URL}/news${queryString ? `?${queryString}` : ''}`)
 
   if (!response.ok) {
     throw new Error(await parseErrorMessage(response))
