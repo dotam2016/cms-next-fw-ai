@@ -105,8 +105,23 @@ so `PostForm` can be reused by both create and edit flows without change:
 
 - Edit page itself (only the shared `PostForm` is built now).
 - Any backend/API route proxy — the browser calls `http://172.16.11.224:8000`
-  directly, so the backend must allow CORS from the Next.js dev origin. If it
-  doesn't, requests will fail with a network error surfaced via toast; fixing
-  CORS on the backend is out of scope for this change.
+  directly, so the backend must allow CORS from the Next.js dev origin.
 - `published_at`, status/draft toggle, thumbnail — not part of the 2-field
   form per requirements.
+
+## Known dependency: backend CORS
+
+Verified via `curl` against the live backend (2026-07-02): `OPTIONS /news`
+with an `Origin: http://localhost:3000` preflight returns `405 Method Not
+Allowed`, and a plain `GET /news` response carries no
+`Access-Control-Allow-Origin` header. CORS is **not** currently enabled on
+the backend.
+
+Because the form fetches `http://172.16.11.224:8000/news` directly from the
+browser, this means `POST /news` submissions **will not work until the
+backend adds CORS** (e.g. FastAPI `CORSMiddleware` allowing the Next.js dev
+origin, at minimum for `POST` and `Content-Type: application/json`). The
+user has confirmed this will be handled separately with the backend team —
+the frontend code proceeds as designed (direct fetch) and does not work
+around it with a proxy. Until CORS is enabled, submitting the form will fail
+with a network/CORS error surfaced via `toast.error`, which is expected.
