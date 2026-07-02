@@ -104,10 +104,10 @@ const columns: ColumnDef<NewsListItem>[] = [
     accessorKey: 'published_at',
     header: '게시 일시',
     cell: ({ row }) => {
-      const publishedAt = row.getValue<string | null>('published_at')
+      const displayDate = row.original.published_at ?? row.original.crawled_at
       return (
         <span className="whitespace-nowrap text-sm text-muted-foreground">
-          {publishedAt ? format(parseISO(publishedAt), 'yyyy-MM-dd HH:mm:ss') : '-'}
+          {displayDate ? format(parseISO(displayDate), 'yyyy-MM-dd HH:mm:ss') : '-'}
         </span>
       )
     },

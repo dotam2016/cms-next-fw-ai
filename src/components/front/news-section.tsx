@@ -187,7 +187,9 @@ export function NewsSection() {
                   <FeaturedBadge />
                 </div>
                 <div className="flex flex-col justify-center gap-2 p-6">
-                  <span className="text-xs text-gray-400">{formatDate(featured.published_at)}</span>
+                  <span className="text-xs text-gray-400">
+                    {formatDate(featured.published_at ?? featured.crawled_at)}
+                  </span>
                   <h2 className="text-lg font-bold text-gray-900">{featured.title}</h2>
                   {featured.description && <p className="text-sm text-gray-500">{featured.description}</p>}
                   <span className="mt-2 flex items-center gap-1 text-sm font-medium text-[#1D4ED8]">
@@ -215,7 +217,9 @@ export function NewsSection() {
                     />
                   </div>
                   <div className="flex flex-1 flex-col gap-2 p-5">
-                    <span className="text-xs text-gray-400">{formatDate(item.published_at)}</span>
+                    <span className="text-xs text-gray-400">
+                      {formatDate(item.published_at ?? item.crawled_at)}
+                    </span>
                     <h3 className="line-clamp-2 text-base font-bold text-gray-900">{item.title}</h3>
                     {item.description && (
                       <p className="line-clamp-2 text-sm text-gray-500">{item.description}</p>
