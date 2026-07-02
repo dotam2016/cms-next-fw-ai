@@ -12,10 +12,12 @@ import {
 } from '@tanstack/react-table'
 import { format, parseISO, isBefore, isAfter, startOfDay, endOfDay } from 'date-fns'
 import Link from 'next/link'
-import { Search, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { SearchInput } from '@/components/ui/search-input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Badge } from '@/components/ui/badge'
 import {
   Select,
@@ -117,7 +119,7 @@ const columns: ColumnDef<Post>[] = [
         href={`/admin/posts/${row.original.id}/edit`}
         className={cn(
           buttonVariants({ variant: 'outline', size: 'sm' }),
-          'border-gray-200 text-xs px-3 h-8 bg-white hover:bg-gray-50 text-gray-700 font-medium shadow-none transition-colors min-w-25'
+          'border-gray-200 text-xs px-3 h-8 bg-white hover:bg-gray-50 text-gray-700 font-medium shadow-none transition-colors min-w-30'
         )}
       >
         수정
@@ -127,6 +129,8 @@ const columns: ColumnDef<Post>[] = [
   },
 ]
 
+// Reusable components are imported from @/components/ui/
+
 interface PostTableProps {
   data: Post[]
 }
@@ -134,6 +138,7 @@ interface PostTableProps {
 export function PostTable({ data }: PostTableProps) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [searchValue, setSearchValue] = useState('')
+  const [activeSearch, setActiveSearch] = useState('')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [pagination, setPagination] = useState<PaginationState>({
@@ -143,7 +148,7 @@ export function PostTable({ data }: PostTableProps) {
 
   const filteredData = useMemo(() => {
     return data.filter((post) => {
-      if (searchValue && !post.title.toLowerCase().includes(searchValue.toLowerCase())) {
+      if (activeSearch && !post.title.toLowerCase().includes(activeSearch.toLowerCase())) {
         return false
       }
       if (dateFrom) {
@@ -156,7 +161,7 @@ export function PostTable({ data }: PostTableProps) {
       }
       return true
     })
-  }, [data, searchValue, dateFrom, dateTo])
+  }, [data, activeSearch, dateFrom, dateTo])
 
   const table = useReactTable({
     data: filteredData,
@@ -178,48 +183,39 @@ export function PostTable({ data }: PostTableProps) {
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3 mb-5">
         {/* Search */}
-        <div className="relative">
-          <Input
-            placeholder="Search"
-            value={searchValue}
-            onChange={(e) => {
-              setSearchValue(e.target.value)
-              setPagination((p) => ({ ...p, pageIndex: 0 }))
-            }}
-            className="h-10 w-72 pr-9 border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md"
-          />
-          <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        </div>
+        <SearchInput
+          value={searchValue}
+          onValueChange={setSearchValue}
+          onSearch={() => {
+            setActiveSearch(searchValue)
+            setPagination((p) => ({ ...p, pageIndex: 0 }))
+          }}
+          onClear={() => {
+            setSearchValue('')
+            setActiveSearch('')
+            setPagination((p) => ({ ...p, pageIndex: 0 }))
+          }}
+        />
 
         {/* Date range */}
         <div className="flex items-center gap-2">
-          <div className="relative">
-            <Input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => {
-                setDateFrom(e.target.value)
-                setPagination((p) => ({ ...p, pageIndex: 0 }))
-              }}
-              placeholder="YYYY.MM.DD"
-              className="h-10 w-[150px] pr-9 border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-9 [&::-webkit-calendar-picker-indicator]:opacity-0"
-            />
-            <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          </div>
+          <DatePicker
+            value={dateFrom}
+            onChange={(val) => {
+              setDateFrom(val)
+              setPagination((p) => ({ ...p, pageIndex: 0 }))
+            }}
+            disabled={(date) => (dateTo ? isAfter(date, endOfDay(parseISO(dateTo))) : false)}
+          />
           <span className="text-sm text-gray-400 font-medium">-</span>
-          <div className="relative">
-            <Input
-              type="date"
-              value={dateTo}
-              onChange={(e) => {
-                setDateTo(e.target.value)
-                setPagination((p) => ({ ...p, pageIndex: 0 }))
-              }}
-              placeholder="YYYY.MM.DD"
-              className="h-10 w-[150px] pr-9 border-gray-200 focus-visible:ring-violet-600 focus-visible:border-violet-600 rounded-md [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-9 [&::-webkit-calendar-picker-indicator]:opacity-0"
-            />
-            <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          </div>
+          <DatePicker
+            value={dateTo}
+            onChange={(val) => {
+              setDateTo(val)
+              setPagination((p) => ({ ...p, pageIndex: 0 }))
+            }}
+            disabled={(date) => (dateFrom ? isBefore(date, startOfDay(parseISO(dateFrom))) : false)}
+          />
         </div>
       </div>
 
@@ -308,6 +304,7 @@ export function PostTable({ data }: PostTableProps) {
 
         {/* Center: Pagination */}
         <div className="flex items-center gap-1 justify-center">
+          {pageCount > 1 && (
           <Button
             variant="ghost"
             size="icon-sm"
@@ -317,6 +314,7 @@ export function PostTable({ data }: PostTableProps) {
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
+          )}
           {Array.from({ length: pageCount }, (_, i) => (
             <Button
               key={i}
@@ -333,6 +331,7 @@ export function PostTable({ data }: PostTableProps) {
               {i + 1}
             </Button>
           ))}
+          {pageCount > 1 && (
           <Button
             variant="ghost"
             size="icon-sm"
@@ -342,6 +341,7 @@ export function PostTable({ data }: PostTableProps) {
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
+          )}
         </div>
 
         {/* Right: Actions */}
@@ -351,7 +351,7 @@ export function PostTable({ data }: PostTableProps) {
             size="sm"
             disabled={selectedIds.length === 0}
             className={cn(
-              "text-xs px-4 h-9 rounded-md transition-colors",
+              "text-xs px-4 h-9 rounded-md transition-colors w-30",
               selectedIds.length === 0
                 ? "bg-gray-50 text-gray-400 border-gray-100 cursor-not-allowed opacity-100"
                 : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
@@ -363,7 +363,7 @@ export function PostTable({ data }: PostTableProps) {
             href="/admin/posts/new"
             className={cn(
               buttonVariants({ size: 'sm' }),
-              'bg-violet-600 hover:bg-violet-700 text-white text-xs px-4 h-9 rounded-md transition-colors'
+              'bg-violet-600 hover:bg-violet-700 text-white text-xs px-4 h-9 rounded-md transition-colors w-30'
             )}
           >
             등록

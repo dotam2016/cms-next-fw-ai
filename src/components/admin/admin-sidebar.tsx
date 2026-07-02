@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import Link from 'next/link'
@@ -29,7 +30,9 @@ export function AdminSidebar({ open }: { open: boolean }) {
       {/* Logo */}
       <div className="flex flex-col h-screen">
         <div className="flex h-16 shrink-0 flex-col justify-center border-b px-6">
-          <p className="text-xl font-bold leading-none tracking-tight text-violet-700">Hivelab</p>
+          <p className="text-xl font-bold leading-none tracking-tight text-violet-700">
+            <img src="/logo_ad.png" alt="Logo"/>
+          </p>
           <p className="mt-1.5 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
             Contents Management System
           </p>

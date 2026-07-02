@@ -15,7 +15,7 @@ export function AdminHeader({ onToggleSidebar }: { onToggleSidebar: () => void }
         <Button variant="ghost" size="icon" render={<Link href="/" />} nativeButton={false}>
           <Home className="h-4 w-4" />
         </Button>
-        <Button  variant="ghost" size="sm" className="cursor-pointer gap-1.5 text-xs text-muted-foreground">
+        <Button  variant="ghost" size="sm" className="hidden cursor-pointer gap-1.5 text-xs text-muted-foreground">
           <Moon className="h-3.5 w-3.5" />
           Dark
         </Button>
