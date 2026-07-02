@@ -28,7 +28,7 @@ export function PostForm({ defaultValues, onSubmit, submitLabel = '등록' }: Po
     formState: { errors, isSubmitting },
   } = useForm<PostFormValues>({
     resolver: zodResolver(postFormSchema),
-    defaultValues: { title: '', description: '', content: '', ...defaultValues },
+    defaultValues: { title: '', description: '', content: '', is_trending: false, ...defaultValues },
   })
 
   const descriptionLength = watch('description')?.length ?? 0
@@ -86,6 +86,18 @@ export function PostForm({ defaultValues, onSubmit, submitLabel = '등록' }: Po
             <Editor value={field.value ?? ''} onChange={field.onChange} placeholder="내용을 입력해주세요" />
           )}
         />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          id="is_trending"
+          type="checkbox"
+          className="h-4 w-4 cursor-pointer accent-violet-600"
+          {...register('is_trending')}
+        />
+        <Label htmlFor="is_trending" className="text-sm font-medium text-gray-700 cursor-pointer">
+          Bài viết nổi bật
+        </Label>
       </div>
 
       <div className="flex items-center justify-end gap-2 pt-2">

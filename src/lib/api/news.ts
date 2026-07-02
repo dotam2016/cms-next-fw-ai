@@ -7,6 +7,7 @@ export interface NewsOut {
   content_html: string | null
   published_at: string | null
   view_count: number
+  is_trending: boolean
   is_deleted: boolean
   deleted_at: string | null
   crawled_at: string
@@ -17,6 +18,7 @@ export interface CreateNewsPayload {
   title: string
   description: string
   content_html?: string | null
+  is_trending?: boolean
 }
 
 export interface NewsListItem {
@@ -130,6 +132,18 @@ export async function updateNews(id: number, payload: UpdateNewsPayload): Promis
 
 export async function deleteNews(id: number): Promise<NewsOut> {
   const response = await fetch(`${API_BASE_URL}/news/${id}`, { method: 'DELETE' })
+
+  if (!response.ok) {
+    throw new Error(await parseErrorMessage(response))
+  }
+
+  return response.json()
+}
+
+export async function setTrending(id: number, value: boolean): Promise<NewsOut> {
+  const response = await fetch(`${API_BASE_URL}/news/${id}/trending?value=${value}`, {
+    method: 'PUT',
+  })
 
   if (!response.ok) {
     throw new Error(await parseErrorMessage(response))

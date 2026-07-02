@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { PostForm } from '@/components/admin/post-form'
-import { getNews, updateNews } from '@/lib/api/news'
+import { getNews, setTrending, updateNews } from '@/lib/api/news'
 import type { PostFormValues } from '@/lib/validations/post'
 
 export default function AdminPostEditPage() {
@@ -30,6 +30,7 @@ export default function AdminPostEditPage() {
           title: news.title,
           description: news.description ?? '',
           content: news.content_html ?? '',
+          is_trending: news.is_trending,
         })
       } catch (err) {
         if (cancelled) return
@@ -47,11 +48,14 @@ export default function AdminPostEditPage() {
 
   const handleSubmit = async (values: PostFormValues) => {
     try {
-      await updateNews(id, {
-        title: values.title,
-        description: values.description,
-        content_html: values.content?.trim() ? values.content : null,
-      })
+      await Promise.all([
+        updateNews(id, {
+          title: values.title,
+          description: values.description,
+          content_html: values.content?.trim() ? values.content : null,
+        }),
+        setTrending(id, values.is_trending),
+      ])
       toast.success('게시글이 수정되었습니다.')
       router.push('/admin/posts')
     } catch (error) {

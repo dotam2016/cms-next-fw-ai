@@ -7,6 +7,7 @@ export const postFormSchema = z.object({
     .min(1, '설명을 입력해주세요')
     .max(200, '설명은 최대 200자까지 입력할 수 있습니다'),
   content: z.string().optional(),
+  is_trending: z.boolean(),
 })
 
 export type PostFormValues = z.infer<typeof postFormSchema>
