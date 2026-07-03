@@ -267,7 +267,7 @@ export function NewsSection() {
           <p className="text-center text-gray-400 text-3xl">검색 결과가 없습니다.</p>
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-sm font-medium text-[#0b1b3a] hover:text-[#132a56] hover:underline"
+            className="flex items-center gap-1.5 text-sm font-medium text-[#0b1b3a] hover:text-[#132a56] hover:bg-[#f9f8f8] border border-[#0b1b3a]/20 rounded-md px-4 py-3 mt-10"
           >
             <ArrowLeft className="h-4 w-4" />
             뉴스 페이지로 돌아가기
@@ -352,7 +352,7 @@ export function NewsSection() {
         <div className="mt-10 flex items-center justify-center gap-1">
           <button
             type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
             aria-label="Previous page"
             onClick={() => updateParams({ page: String(page - 1) })}
             disabled={page <= 1}
@@ -366,8 +366,8 @@ export function NewsSection() {
               onClick={() => updateParams({ page: String(i + 1) })}
               className={
                 page - 1 === i
-                  ? 'flex h-8 w-8 items-center justify-center rounded-md bg-[#0B1B3A] text-sm font-medium text-white'
-                  : 'flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100'
+                  ? 'flex h-8 w-8 items-center justify-center rounded-md bg-[#0B1B3A] text-sm font-medium text-white cursor-pointer'
+                  : 'flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 cursor-pointer'
               }
             >
               {i + 1}
@@ -375,7 +375,7 @@ export function NewsSection() {
           ))}
           <button
             type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
             aria-label="Next page"
             onClick={() => updateParams({ page: String(page + 1) })}
             disabled={page >= pageCount}

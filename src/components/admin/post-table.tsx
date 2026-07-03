@@ -157,7 +157,7 @@ export function PostTable() {
   const dateFrom = searchParams.get('date_from') ?? ''
   const dateTo = searchParams.get('date_to') ?? ''
   const page = Number(searchParams.get('page') ?? '1')
-  const pageSize = Number(searchParams.get('page_size') ?? '5')
+  const pageSize = Number(searchParams.get('page_size') ?? '3')
 
   const [searchValue, setSearchValue] = useState(q)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
@@ -309,9 +309,9 @@ export function PostTable() {
             {pageSize}개씩 보기
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="3">3개씩 보기</SelectItem>
             <SelectItem value="5">5개씩 보기</SelectItem>
-            <SelectItem value="10">10개씩 보기</SelectItem>
-            <SelectItem value="15">15개씩 보기</SelectItem>
+            <SelectItem value="7">7개씩 보기</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -405,7 +405,7 @@ export function PostTable() {
           <Button
             variant="ghost"
             size="icon-sm"
-            className="rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-30 h-8 w-8"
+            className="rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-30 h-8 w-8 cursor-pointer"
             onClick={() => updateParams({ page: String(page - 1) })}
             disabled={page <= 1}
           >
@@ -418,7 +418,7 @@ export function PostTable() {
               variant={page - 1 === i ? 'default' : 'ghost'}
               size="icon-sm"
               className={cn(
-                'rounded-md h-8 w-8 text-sm font-medium transition-colors',
+                'rounded-md h-8 w-8 text-sm font-medium transition-colors cursor-pointer',
                 page - 1 === i
                   ? 'bg-[#0b1b3a] hover:bg-[#132a56] text-white'
                   : 'text-gray-600 hover:bg-gray-100'
@@ -432,7 +432,7 @@ export function PostTable() {
           <Button
             variant="ghost"
             size="icon-sm"
-            className="rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-30 h-8 w-8"
+            className="rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-30 h-8 w-8 cursor-pointer"
             onClick={() => updateParams({ page: String(page + 1) })}
             disabled={page >= pageCount}
           >

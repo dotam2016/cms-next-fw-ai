@@ -135,7 +135,7 @@ export default function NewsDetailPage() {
                 <button
                   type="button"
                   onClick={handleCopyUrl}
-                  className="flex items-center gap-1.5 rounded-md border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                  className="flex cursor-pointer items-center gap-1.5 rounded-md border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
                 >
                   <Copy className="h-3.5 w-3.5" />
                   URL 복사
