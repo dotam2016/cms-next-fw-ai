@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, ChevronRight } from 'lucide-react'
 
@@ -26,9 +25,6 @@ export function AdminBreadcrumb() {
     <div className="border-b bg-white px-8 py-4">
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
         <Home className="h-3.5 w-3.5" />
-        <Link href="/admin" className="hover:text-foreground">
-          Hivelab
-        </Link>
         {crumbLabel && (
           <>
             <ChevronRight className="h-3.5 w-3.5" />

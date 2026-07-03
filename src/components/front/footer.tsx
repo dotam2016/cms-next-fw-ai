@@ -76,7 +76,7 @@ export function Footer() {
             제품 소식, 업계 인사이트, 기업 뉴스를 이메일로 받아보세요.
           </p>
 
-          <div className="mx-auto mt-8 flex max-w-md items-center rounded-full border border-[#2f3a65] bg-white/5 p-1">
+          <div className="mx-auto mt-8 flex max-w-md items-center rounded-full border border-[#2f3a65]! bg-white/5 p-1">
             <input
               type="email"
               placeholder="업무용 이메일을 입력하세요..."
@@ -142,7 +142,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#17264d] pt-6 text-xs text-white/40 sm:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#17264d]! pt-6 text-xs text-white/40 sm:flex-row">
           <p>© 2026 React Corporation. All Rights Reserved.</p>
           <div className="flex items-center gap-6">
             {legalLinks.map((link) => (

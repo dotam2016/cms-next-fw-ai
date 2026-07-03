@@ -16,7 +16,7 @@ import {
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { label: 'Main Home', href: '#none', icon: Home },
+  // { label: 'Main Home', href: '#none', icon: Home },
   { label: 'Blog & News', href: '/admin/posts', icon: Newspaper },
 ]
 
@@ -73,7 +73,7 @@ export function AdminSidebar({ open }: { open: boolean }) {
 
         {/* Footer */}
         <div className="border-t px-6 py-4">
-          <p className="text-[11px] text-muted-foreground">© 2026 Hivelab. All rights reserved.</p>
+          <p className="text-[11px] text-muted-foreground">© 2026 Company. All rights reserved.</p>
         </div>
         </div>
     </aside>

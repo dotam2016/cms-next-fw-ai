@@ -57,6 +57,12 @@ export interface UpdateNewsPayload {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
+if (!API_BASE_URL) {
+  throw new Error(
+    'NEXT_PUBLIC_API_BASE_URL이 설정되지 않았습니다. Vercel 프로젝트의 Environment Variables에 값을 추가한 뒤 다시 배포하세요.'
+  )
+}
+
 async function parseErrorMessage(response: Response): Promise<string> {
   try {
     const body = await response.json()
