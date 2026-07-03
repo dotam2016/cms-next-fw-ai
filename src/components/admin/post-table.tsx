@@ -284,12 +284,14 @@ export function PostTable() {
             value={dateFrom}
             onChange={(val) => updateParams({ date_from: val || null, page: null })}
             disabled={(date) => (dateTo ? isAfter(date, endOfDay(parseISO(dateTo))) : false)}
+            boundary="start"
           />
           <span className="text-sm text-gray-400 font-medium">-</span>
           <DatePicker
             value={dateTo}
             onChange={(val) => updateParams({ date_to: val || null, page: null })}
             disabled={(date) => (dateFrom ? isBefore(date, startOfDay(parseISO(dateFrom))) : false)}
+            boundary="end"
           />
         </div>
       </div>
@@ -472,7 +474,7 @@ export function PostTable() {
         <DialogContent showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>게시글 삭제</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-center">
               선택한 {selectedIds.length}개의 게시글을 삭제하시겠습니까? <br />삭제된 게시글은 목록에서 숨겨지며.
             </DialogDescription>
           </DialogHeader>
