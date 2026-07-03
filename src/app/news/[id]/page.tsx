@@ -42,11 +42,11 @@ export default function NewsDetailPage() {
       try {
         const [articleResult, latestResult] = await Promise.all([
           getNews(id),
-          listNews({ page: 1, page_size: 3 }),
+          listNews({ page: 1, page_size: 4 }),
         ])
         if (cancelled) return
         setArticle(articleResult)
-        setLatest(latestResult.items)
+        setLatest(latestResult.items.filter((item) => item.id !== id).slice(0, 3))
       } catch (err) {
         if (cancelled) return
         setError(err instanceof Error ? err.message : '게시글을 불러오지 못했습니다.')
@@ -61,12 +61,36 @@ export default function NewsDetailPage() {
     }
   }, [id])
 
+  const copyWithFallback = (text: string) => {
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.style.position = 'fixed'
+    textarea.style.top = '-9999px'
+    textarea.style.left = '-9999px'
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+    const succeeded = document.execCommand('copy')
+    document.body.removeChild(textarea)
+    if (!succeeded) throw new Error('execCommand copy failed')
+  }
+
   const handleCopyUrl = async () => {
+    const url = window.location.href
     try {
-      await navigator.clipboard.writeText(window.location.href)
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url)
+      } else {
+        copyWithFallback(url)
+      }
       toast.success('URL이 복사되었습니다.')
     } catch {
-      toast.error('URL 복사에 실패했습니다.')
+      try {
+        copyWithFallback(url)
+        toast.success('URL이 복사되었습니다.')
+      } catch {
+        toast.error('URL 복사에 실패했습니다.')
+      }
     }
   }
 
@@ -77,9 +101,9 @@ export default function NewsDetailPage() {
       {/* Breadcrumb */}
       <div className="border-b border-gray-200 bg-gray-50">
         <div className="mx-auto max-w-[1400px] px-6 py-3 text-xs text-gray-500">
-          <Link href="/" className="hover:text-gray-700">홈</Link>
+          <Link href="/" className="hover:text-gray-700">Home</Link>
           <span className="mx-2">&gt;</span>
-          <Link href="/" className="hover:text-gray-700">뉴스 &amp; 미디어</Link>
+          <Link href="/" className="hover:text-gray-700">News & Media</Link>
           {article && (
             <>
               <span className="mx-2">&gt;</span>
@@ -89,7 +113,7 @@ export default function NewsDetailPage() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-[1400px] px-6 py-10 pb-30">
+      <main className="mx-auto max-w-[1400px] px-6 py-10 pb-30 min-h-[200px]">
         {loading ? (
           <p className="text-center text-sm text-gray-400">불러오는 중...</p>
         ) : error || !article ? (

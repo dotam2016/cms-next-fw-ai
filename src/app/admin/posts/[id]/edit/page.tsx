@@ -72,7 +72,7 @@ export default function AdminPostEditPage() {
         <h1 className="text-2xl font-bold tracking-tight">블로그 & 뉴스 글 수정</h1>
         {createdAt && (
           <span className="text-sm text-muted-foreground">
-            created: {format(parseISO(createdAt), 'yyyy-MM-dd HH:mm:ss')}
+            Created: {format(parseISO(createdAt), 'yyyy-MM-dd HH:mm:ss')}
           </span>
         )}
       </div>

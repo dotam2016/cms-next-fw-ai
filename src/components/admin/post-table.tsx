@@ -94,7 +94,7 @@ const columns: ColumnDef<NewsListItem>[] = [
         />
       </div>
     ),
-    size: 120,
+    size: 80,
   },
   {
     accessorKey: 'title',
@@ -104,6 +104,7 @@ const columns: ColumnDef<NewsListItem>[] = [
         {row.getValue<string>('title')}
       </p>
     ),
+    size: 200,
   },
   {
     accessorKey: 'description',
@@ -120,6 +121,7 @@ const columns: ColumnDef<NewsListItem>[] = [
     header: '게시 일시',
     cell: ({ row }) => {
       const displayDate = row.original.published_at ?? row.original.crawled_at
+      console.log('displayDate:', row.original.published_at, row.original.crawled_at) // Add this line to log the displayDate value
       return (
         <span className="whitespace-nowrap text-sm text-muted-foreground">
           {displayDate ? format(parseISO(displayDate), 'yyyy-MM-dd HH:mm:ss') : '-'}
@@ -155,7 +157,7 @@ export function PostTable() {
   const dateFrom = searchParams.get('date_from') ?? ''
   const dateTo = searchParams.get('date_to') ?? ''
   const page = Number(searchParams.get('page') ?? '1')
-  const pageSize = Number(searchParams.get('page_size') ?? '20')
+  const pageSize = Number(searchParams.get('page_size') ?? '5')
 
   const [searchValue, setSearchValue] = useState(q)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
@@ -297,7 +299,7 @@ export function PostTable() {
         <p className="text-sm text-gray-700">
           전체 <span className="font-bold text-gray-900">{total}</span>
         </p>
-        {/* <Select
+        <Select
           value={String(pageSize)}
           onValueChange={(val) => updateParams({ page_size: val, page: null })}
         >
@@ -305,11 +307,11 @@ export function PostTable() {
             {pageSize}개씩 보기
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="5">5개씩 보기</SelectItem>
             <SelectItem value="10">10개씩 보기</SelectItem>
-            <SelectItem value="20">20개씩 보기</SelectItem>
-            <SelectItem value="50">50개씩 보기</SelectItem>
+            <SelectItem value="15">15개씩 보기</SelectItem>
           </SelectContent>
-        </Select> */}
+        </Select>
       </div>
 
       {/* Table */}
