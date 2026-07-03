@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { ArrowRight, Copy } from 'lucide-react'
 import { SiteHeader } from '@/components/front/site-header'
+import { Footer } from '@/components/front/footer'
 import { getNews, listNews, type NewsListItem, type NewsOut } from '@/lib/api/news'
 
 function formatDate(dateString: string | null) {
@@ -158,6 +159,8 @@ export default function NewsDetailPage() {
           </>
         )}
       </main>
+
+      <Footer />
     </div>
   )
 }

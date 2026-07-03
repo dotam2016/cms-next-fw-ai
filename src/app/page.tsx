@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { SiteHeader } from '@/components/front/site-header'
 import { NewsSection } from '@/components/front/news-section'
+import { Footer } from '@/components/front/footer'
 
 export default function Home() {
   return (
@@ -22,6 +23,8 @@ export default function Home() {
           <NewsSection />
         </Suspense>
       </main>
+
+      <Footer />
     </div>
   )
 }
