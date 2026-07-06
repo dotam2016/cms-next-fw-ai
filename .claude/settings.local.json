@@ -5,7 +5,21 @@
       "Bash(rm -f verify-admin-posts.png verify-admin-posts-v2.png verify-admin-posts-full.png verify-bottom.png verify-final.png verify-v3.png)",
       "Bash(pnpm tsc *)",
       "Skill(run)",
-      "Bash(chromium-cli --help)"
+      "Bash(chromium-cli --help)",
+      "WebFetch(domain:172.16.11.224)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/admin/posts)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/admin/posts/create)",
+      "Bash(git commit *)",
+      "Bash(curl -s http://localhost:3000/admin/posts/create)",
+      "Bash(git add *)",
+      "Bash(curl -s -o /dev/null -w \"STATUS:%{http_code}\\\\n\" http://localhost:3000/admin/posts/create)",
+      "Bash(curl -s -o /dev/null -w \"create: %{http_code}\\\\n\" http://localhost:3000/admin/posts/create)",
+      "Bash(curl -s -o /dev/null -w \"list: %{http_code}\\\\n\" http://localhost:3000/admin/posts)",
+      "Bash(git commit -m ' *)",
+      "Bash(curl -s -X DELETE http://172.16.11.224:8000/news/8)",
+      "Bash(curl -s \"http://172.16.11.224:8000/news\")",
+      "Bash(curl -s -o /dev/null -w \"LIST:%{http_code}\\\\n\" http://localhost:3000/admin/posts)",
+      "Bash(curl -s http://localhost:3000/admin/posts)"
     ]
   }
 }

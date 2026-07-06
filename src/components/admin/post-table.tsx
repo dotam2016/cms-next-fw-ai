@@ -157,7 +157,7 @@ export function PostTable() {
   const dateFrom = searchParams.get('date_from') ?? ''
   const dateTo = searchParams.get('date_to') ?? ''
   const page = Number(searchParams.get('page') ?? '1')
-  const pageSize = Number(searchParams.get('page_size') ?? '3')
+  const pageSize = Number(searchParams.get('page_size') ?? '10')
 
   const [searchValue, setSearchValue] = useState(q)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
@@ -309,9 +309,9 @@ export function PostTable() {
             {pageSize}개씩 보기
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="3">3개씩 보기</SelectItem>
-            <SelectItem value="5">5개씩 보기</SelectItem>
-            <SelectItem value="7">7개씩 보기</SelectItem>
+            <SelectItem value="10">10개씩 보기</SelectItem>
+            <SelectItem value="15">15개씩 보기</SelectItem>
+            <SelectItem value="20">20개씩 보기</SelectItem>
           </SelectContent>
         </Select>
       </div>
