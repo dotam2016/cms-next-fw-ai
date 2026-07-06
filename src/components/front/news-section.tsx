@@ -55,7 +55,7 @@ function HighlightText({ text, query }: { text: string; query: string }) {
 
 function FeaturedBadge() {
   return (
-    <span className="absolute left-3 top-3 rounded bg-black/60 px-2 py-1 text-[10px] font-semibold tracking-wide text-white">
+    <span className="123 absolute left-3 top-3 rounded bg-black/60 px-2 py-1 text-[10px] font-semibold tracking-wide text-white">
       Featured News
     </span>
   )
