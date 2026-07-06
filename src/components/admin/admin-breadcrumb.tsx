@@ -24,7 +24,7 @@ export function AdminBreadcrumb() {
   return (
     <div className="border-b bg-white px-8 py-4">
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
-        <Home className="h-3.5 w-3.5" />
+        <Home className="h-3.5 w-3.5 abc" />
         {crumbLabel && (
           <>
             <ChevronRight className="h-3.5 w-3.5" />
